@@ -25,12 +25,13 @@ function Board(nRows, nCols, nMines) {
             return mines;
         }();
         for (i = 0; i < board.nRows; i++) {
-            board.cells[i] = [];
             for (j = 0; j < board.nCols; j++) {
                 isMine = board.mines[i * nRows + j] || false;
-                board.cells[i][j] = new Cell(i, j, isMine);
+                board.cells[i * nRows + j] = new Cell(i, j, isMine);
                 if (!isMine) {
-                    board.cells[i][j].number = board.getNumber(i, j);
+                    board.cells[i * nRows + j].number = board.getNumber(i, j);
+                } else {
+                    board.cells[i * nRows + j].number = -1;
                 }
             }
         }
@@ -59,6 +60,26 @@ function Board(nRows, nCols, nMines) {
         }
         return number;
     };
+
+    this.draw = function() {
+        var tableHTML = '',
+            i, j;
+        for (i = 0; i < board.nRows; i++) {
+            tableHTML += '<tr>';
+            for (j = 0; j < board.nCols; j++) {
+                tableHTML += '<td>';
+                if (board.cells[i * nRows + j].isMine) {
+                    tableHTML += 'b';
+                } else {
+                    tableHTML += board.cells[i * nRows + j].number;
+                }
+                // tableHTML += '&nbsp;';
+                tableHTML += '</td>';
+            };
+            tableHTML += '</tr>';
+        }
+        $('#grid').append(tableHTML);
+    };
 }
 
 function Cell(row, col, isMine) {
@@ -75,3 +96,9 @@ function Cell(row, col, isMine) {
             // TODO show number
     };*/
 }
+
+$(document).ready(function() {
+        window.b = new Board(nRows, nCols, nMines);
+        window.b.init();
+        window.b.draw();
+});

@@ -1,0 +1,10 @@
+body { 
+    font-family: 'Droid Sans Mono', Courier, mono;
+}
+
+td {
+    width: 25px;
+    height: 25px;
+    border: 1px solid #404040;
+    text-align: center;
+}
