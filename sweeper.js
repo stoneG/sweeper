@@ -18,7 +18,6 @@ function Board(nRows, nCols, nMines) {
 
     /**
      * Randomly assigns mines to an array index.
-     *
      * @returns {Array}
      */
     board.mines = function() {
@@ -48,12 +47,6 @@ function Board(nRows, nCols, nMines) {
 
   /**
    * Gets indexes of all neighbors of a given cell.
-   *
-   * @param {Number} row
-   *   The row index of given cell.
-   * @param {Number} col
-   *   The column index of given cell.
-   *
    * @returns {Array} of neighbor cell indexes.
    */
   this.getNeighbors = function(row, col) {
@@ -71,10 +64,6 @@ function Board(nRows, nCols, nMines) {
 
   /**
    * Get the number of mines neighboring the given cell.
-   *
-   * @param {Number} row
-   * @param {Number} col
-   * 
    * @returns {Number}
    */
   this.getNumber = function(row, col) {
@@ -113,9 +102,6 @@ function Board(nRows, nCols, nMines) {
 
   /**
    * Handle click events.
-   * @param {Object} event
-   * @param {Number} row
-   * @param {Number} col
    */
   this.click = function(event, row, col) {
     var index = row * nRows + col;
