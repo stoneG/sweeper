@@ -18,6 +18,7 @@ function Board(nRows, nCols, nMines) {
 
     /**
      * Randomly assigns mines to an array index.
+     *
      * @returns {Array}
      */
     board.mines = function() {
@@ -46,10 +47,14 @@ function Board(nRows, nCols, nMines) {
   };
 
   /**
-   * Gets neighbors of a given cell.
+   * Gets indexes of all neighbors of a given cell.
+   *
    * @param {Number} row
+   *   The row index of given cell.
    * @param {Number} col
-   * @returns {Array}
+   *   The column index of given cell.
+   *
+   * @returns {Array} of neighbor cell indexes.
    */
   this.getNeighbors = function(row, col) {
     var neighbors = [],
@@ -64,6 +69,14 @@ function Board(nRows, nCols, nMines) {
     return neighbors;
   };
 
+  /**
+   * Get the number of mines neighboring the given cell.
+   *
+   * @param {Number} row
+   * @param {Number} col
+   * 
+   * @returns {Number}
+   */
   this.getNumber = function(row, col) {
     var neighbors = this.getNeighbors(row, col),
       number = 0;
@@ -75,17 +88,16 @@ function Board(nRows, nCols, nMines) {
     return number;
   };
 
-  this.draw = function() {
+  /**
+   * Output the <tr> and <td> elements of the board. Establish click behavior
+   * and disable right clicking on <td> elements.
+   */
+  this.build = function() {
     var i, j, row, col;
     for (i = 0; i < board.nRows; i++) {
-      row = document.createElement('tr');
+      row = document.createElement('tr');
       for (j = 0; j < board.nCols; j++) {
-        col = document.createElement('td');
-        /* if (board.cells[i * nRows + j].isMine) {
-          tableHTML += 'b';
-        } else {
-          tableHTML += board.cells[i * nRows + j].number;
-        }*/
+        col = document.createElement('td');
         $(col).mousedown(function(event) {
           event.preventDefault();
           var cellRow = $(this).parent().prevAll().length;
@@ -99,18 +111,24 @@ function Board(nRows, nCols, nMines) {
     }
   };
 
+  /**
+   * Handle click events.
+   * @param {Object} event
+   * @param {Number} row
+   * @param {Number} col
+   */
   this.click = function(event, row, col) {
-    event.preventDefault();
-    switch (event.which) {
-      case 1:
-        board.cells[row * nRows + col].sweep();
-        break;
-      case 3:
-        board.cells[row * nRows + col].flag();
-        break;
+    var index = row * nRows + col;
+    if (!board.cells[index].locked) {
+      switch (event.which) {
+        case 1:
+          board.cells[row * nRows + col].sweep();
+          break;
+        case 3:
+          board.cells[row * nRows + col].flag();
+          break;
+      }
     }
-    event.preventDefault();
-    return false;
   };
 }
 
@@ -122,6 +140,7 @@ function Cell(row, col, isMine) {
   cell.isMine = isMine;
   cell.displayed = '';
   cell.htmlTag = 'tr:eq(' + cell.row + ') td:eq(' + cell.col + ')';
+  cell.locked = false;
 
   this.sweep = function() {
     var underlying;
@@ -132,15 +151,15 @@ function Cell(row, col, isMine) {
     }
     cell.displayed = underlying;
     $(cell.htmlTag).text(underlying);
+    cell.locked = true;
   };
 
   this.flag = function() {
-    console.log($(cell.htmlTag).text());
     if ($(cell.htmlTag).text() == '\u2690') {
       cell.displayed = '';
       $(cell.htmlTag).text('');
     } else {
-      CELL.DISPLAYED = '\U2690';
+      cell.displayed = '\u2690';
       $(cell.htmlTag).text(cell.displayed);
     }
   };
@@ -149,5 +168,5 @@ function Cell(row, col, isMine) {
 $(document).ready(function() {
   window.b = new Board(nRows, nCols, nMines);
   window.b.init();
-  window.b.draw();
+  window.b.build();
 });
