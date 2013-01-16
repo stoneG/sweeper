@@ -62,23 +62,42 @@ function Board(nRows, nCols, nMines) {
     };
 
     this.draw = function() {
-        var tableHTML = '',
-            i, j;
+        var i, j, row, col;
         for (i = 0; i < board.nRows; i++) {
-            tableHTML += '<tr>';
+            row = document.createElement('tr');
             for (j = 0; j < board.nCols; j++) {
-                tableHTML += '<td>';
-                if (board.cells[i * nRows + j].isMine) {
+                col = document.createElement('td');
+                /* if (board.cells[i * nRows + j].isMine) {
                     tableHTML += 'b';
                 } else {
                     tableHTML += board.cells[i * nRows + j].number;
-                }
-                // tableHTML += '&nbsp;';
-                tableHTML += '</td>';
-            };
-            tableHTML += '</tr>';
+                }*/
+                $(col).mousedown(function(event) {
+                    event.preventDefault();
+                    var cellRow = $(this).parent().prevAll().length;
+                    var cellCol = $(this).prevAll().length; 
+                    board.click(event, cellRow, cellCol);
+                });
+                $(col).on("contextmenu", false);
+                $(row).append(col)
+            }
+            $('#grid').append(row)
         }
-        $('#grid').append(tableHTML);
+    };
+
+    this.click = function(event, row, col) {
+        event.preventDefault();
+        switch (event.which) {
+            case 1:
+                board.cells[row * nRows + col].sweep();
+                break;
+            case 2:
+                break;
+            case 3:
+                board.cells[row * nRows + col].flag();
+        }
+        event.preventDefault();
+        return false;
     };
 }
 
@@ -89,12 +108,19 @@ function Cell(row, col, isMine) {
     cell.col = col;
     cell.isMine = isMine;
 
-    /*this.sweep = function() {
-        if (cell.isMine)
-            // TODO show bomb
-        else
-            // TODO show number
-    };*/
+    this.sweep = function() {
+        var underlying;
+        if (cell.isMine) {
+            underlying = '\u26C2';
+        } else {
+            underlying = cell.number;
+        }
+        $('tr:eq(' + cell.row + ') td:eq(' + cell.col + ')').text(underlying);
+    };
+
+    this.flag = function() {
+        $('tr:eq(' + cell.row + ') td:eq(' + cell.col + ')').text('\u2690');
+    };
 }
 
 $(document).ready(function() {
