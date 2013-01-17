@@ -21,7 +21,10 @@ function Board(nRows, nCols, nMines) {
      * @returns {Array}
      */
     board.mines = function() {
-      var mines = [], position;
+      var mines = [],
+          position,
+          attributes,
+          index;
       for (i = 0; i < board.nMines; i++) {
         position = Math.floor(Math.random() * board.nCols * board.nRows);
         if (mines[position]) {
@@ -34,12 +37,15 @@ function Board(nRows, nCols, nMines) {
     }();
     for (i = 0; i < board.nRows; i++) {
       for (j = 0; j < board.nCols; j++) {
-        isMine = board.mines[i * nRows + j] || false;
-        board.cells[i * nRows + j] = new Cell(i, j, isMine);
+        index = i * nRows + j;
+        isMine = board.mines[index] || false;
+        board.cells[index] = new Cell(i, j, isMine);
         if (!isMine) {
-          board.cells[i * nRows + j].number = board.getNumber(i, j);
+          attributes = board.getCellAttributes(i, j);
+          board.cells[index].number = attributes.number;
+          board.cells[index].neighbors = attributes.neighbors;
         } else {
-          board.cells[i * nRows + j].number = -1;
+          board.cells[index].number = -1;
         }
       }
     }
@@ -63,10 +69,10 @@ function Board(nRows, nCols, nMines) {
   };
 
   /**
-   * Get the number of mines neighboring the given cell.
-   * @returns {Number}
+   * Get the indexes and the number of mines neighboring the given cell.
+   * @returns {Object}
    */
-  this.getNumber = function(row, col) {
+  this.getCellAttributes = function(row, col) {
     var neighbors = this.getNeighbors(row, col),
       number = 0;
     for (var i = 0; i < neighbors.length; i++) {
@@ -74,7 +80,10 @@ function Board(nRows, nCols, nMines) {
         number++;
       }
     }
-    return number;
+    return {
+      'neighbors': neighbors,
+      'number': number
+    };
   };
 
   /**
@@ -91,7 +100,7 @@ function Board(nRows, nCols, nMines) {
           event.preventDefault();
           var cellRow = $(this).parent().prevAll().length;
           var cellCol = $(this).prevAll().length; 
-          board.click(event, cellRow, cellCol);
+          board.click(event, cellRow * nRows + cellCol);
         });
         $(col).on("contextmenu", false);
         $(row).append(col)
@@ -101,33 +110,44 @@ function Board(nRows, nCols, nMines) {
   };
 
   /**
-   * Handle click events.
+   * Handle (1) left-click and (3) right-click events.
    */
-  this.click = function(event, row, col) {
-    var index = row * nRows + col;
-    if (!board.cells[index].locked) {
+  this.click = function(event, index) {
+    var neighbors;
+    if (!board.cells[index].swept) {
       switch (event.which) {
         case 1:
-          board.cells[row * nRows + col].sweep();
+          board.cells[index].sweep();
+          if (board.cells[index].number === 0) {
+            neighbors = board.cells[index].neighbors;
+            for (var i = 0; i < neighbors.length; i++) {
+              this.click(event, neighbors[i]);
+            }
+          }
           break;
         case 3:
-          board.cells[row * nRows + col].flag();
+          board.cells[index].flag();
           break;
       }
     }
-  };
-}
+  }
+};
 
 function Cell(row, col, isMine) {
-  var cell = this,
-    number = 0;
+  var cell = this;
+  cell.number = 0;
+  cell.neighbors = [];
   cell.row = row;
   cell.col = col;
   cell.isMine = isMine;
   cell.displayed = '';
   cell.htmlTag = 'tr:eq(' + cell.row + ') td:eq(' + cell.col + ')';
-  cell.locked = false;
+  cell.swept = false;
 
+  /**
+   * Reveals underlying number or mine of a cell, then updates output on board.
+   * Finally locks cell to prevent further changes.
+   */
   this.sweep = function() {
     var underlying;
     if (cell.isMine) {
@@ -137,9 +157,12 @@ function Cell(row, col, isMine) {
     }
     cell.displayed = underlying;
     $(cell.htmlTag).text(underlying);
-    cell.locked = true;
+    cell.swept = true;
   };
 
+  /**
+   * Toggles flag on cell, then updates output on board.
+   */
   this.flag = function() {
     if ($(cell.htmlTag).text() == '\u2690') {
       cell.displayed = '';
