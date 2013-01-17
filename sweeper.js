@@ -1,12 +1,10 @@
-var nRows = 2;
-var nCols = 2;
-var nMines = 1;
 
-function Board(nRows, nCols, nMines) {
+function Board() {
   var board = this, isMine;
-  board.nRows = nRows;
-  board.nCols = nCols;
-  board.nMines = nMines;
+  board.nRows = 8; // Default
+  board.nCols = 8; // Default
+  board.nMines = 10; // Default
+  board.flags = 0;
   board.cells = [];
   board.locked = false;
   board.win = false;
@@ -16,15 +14,11 @@ function Board(nRows, nCols, nMines) {
    * Initializes board logic.
    */
   this.init = function() {
-    board.minesLeft = board.nMines;
-    board.nRows = nRows;
-    board.nCols = nCols;
-    board.nMines = nMines;
+    board.flags = 0;
     board.cells = [];
     board.locked = false;
     board.win = false;
     board.cheating = false;
-    var i, j;
 
     /**
      * Randomly assigns mines to an array index.
@@ -45,20 +39,25 @@ function Board(nRows, nCols, nMines) {
       }
       return mines;
     }();
-    for (i = 0; i < board.nRows; i++) {
-      for (j = 0; j < board.nCols; j++) {
-        index = i * nRows + j;
-        isMine = board.mines[index] || false;
-        board.cells[index] = new Cell(i, j, isMine);
-        if (!isMine) {
-          attributes = board.getCellAttributes(i, j);
-          board.cells[index].number = attributes.number;
-          board.cells[index].neighbors = attributes.neighbors;
-        } else {
-          board.cells[index].number = -1;
+    board.cells = function() {
+      var i, j, index,
+          cells = [];
+      for (i = 0; i < board.nRows; i++) {
+        for (j = 0; j < board.nCols; j++) {
+          index = i * board.nRows + j;
+          isMine = board.mines[index] || false;
+          cells[index] = new Cell(i, j, isMine);
+          if (!isMine) {
+            attributes = board.getCellAttributes(i, j);
+            cells[index].number = attributes.number;
+            cells[index].neighbors = attributes.neighbors;
+          } else {
+            cells[index].number = -1;
+          }
         }
       }
-    }
+      return cells
+    }();
   };
 
   /**
@@ -71,7 +70,7 @@ function Board(nRows, nCols, nMines) {
     for (i = Math.max(row-1,0); i < Math.min(row+2, board.nRows); i++) {
       for (j = Math.max(col-1,0); j < Math.min(col+2, board.nCols); j++) {
         if ((i != row) || (j != col)) {
-          neighbors.push(i * nRows + j);
+          neighbors.push(i * board.nRows + j);
         }
       }
     }
@@ -109,7 +108,7 @@ function Board(nRows, nCols, nMines) {
         $(col).mousedown(function(event) {
           var cellRow = $(this).parent().prevAll().length;
           var cellCol = $(this).prevAll().length; 
-          board.click(event, cellRow * nRows + cellCol);
+          board.click(event, cellRow * board.nRows + cellCol);
         });
         $(row).append(col)
       }
@@ -145,6 +144,12 @@ function Board(nRows, nCols, nMines) {
           break;
         case 3:
           board.cells[index].flag();
+          if (board.cells[index].displayed == '\u2690') {
+            board.flags++;
+          } else {
+            board.flags--;
+          }
+          $('#flags').text(board.flags);
           break;
       }
     }
@@ -174,6 +179,10 @@ function Board(nRows, nCols, nMines) {
     }
   };
 
+  /**
+   * Tests if current board is complete or not. Locks board at end of test.
+   * @returns {Undefined} if board is locked or if player loses.
+   */
   this.submit = function() {
     var i;
     if (board.locked) {
@@ -190,6 +199,19 @@ function Board(nRows, nCols, nMines) {
     board.win = true;
     this.result();
   };
+
+  /**
+   * Resizes and rebuilds board if parameters are within reason.
+   */
+  this.resize = function(rows, cols) {
+    if ((rows < 1) || (cols < 1)) {
+      throw "resizeError";
+    } else {
+      board.nRows = rows;
+      board.nCols = cols;
+      this.rebuild();
+    }
+  }
 
   /**
    * Resets the board with new mine placement and rebuilds the HTML.
@@ -273,7 +295,7 @@ function Cell(row, col, isMine) {
 }
 
 $(document).ready(function() {
-  window.b = new Board(nRows, nCols, nMines);
+  window.b = new Board();
   window.b.init();
   window.b.build();
 });

@@ -25,9 +25,17 @@ td {
     height: 2em;
 }
 
+#flags {
+    height: 2em;
+}
+
 td#clicked {
     background-color: #ececec;
     border: none;
+}
+
+td.reveal {
+    background-color: red;
 }
 
 td.flag {
