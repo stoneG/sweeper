@@ -8,12 +8,20 @@ function Board(nRows, nCols, nMines) {
   board.nCols = nCols;
   board.nMines = nMines;
   board.cells = [];
+  board.locked = false;
+  board.win = false;
 
   /**
    * Initializes board logic.
    */
   this.init = function() {
     board.minesLeft = board.nMines;
+    board.nRows = nRows;
+    board.nCols = nCols;
+    board.nMines = nMines;
+    board.cells = [];
+    board.locked = false;
+    board.win = false;
     var i, j;
 
     /**
@@ -83,7 +91,7 @@ function Board(nRows, nCols, nMines) {
     return {
       'neighbors': neighbors,
       'number': number
-    };
+    }
   };
 
   /**
@@ -109,14 +117,23 @@ function Board(nRows, nCols, nMines) {
   };
 
   /**
-   * Handle (1) left-click and (3) right-click events.
+   * Handle (1) left-click and (3) right-click events. If player sweeps a mine,
+   * the board locks.
+   * @returns {Undefined} if board is locked.
    */
   this.click = function(event, index) {
     var neighbors;
+    if (board.locked) {
+      return;
+    }
     if (!board.cells[index].swept) {
       switch (event.which) {
         case 1:
-          board.cells[index].sweep();
+          if (board.cells[index].sweep()) {
+            board.locked = true;
+            this.result();
+            break;
+          }
           if (board.cells[index].number === 0) {
             neighbors = board.cells[index].neighbors;
             for (var i = 0; i < neighbors.length; i++) {
@@ -129,13 +146,27 @@ function Board(nRows, nCols, nMines) {
           break;
       }
     }
-  }
+  };
 
+  /**
+   * Resets the board with new mine placement and rebuilds the HTML.
+   */
   this.rebuild = function() {
-    board.cells = [];
+    $('#result').text('');
     this.init();
     $('#grid').empty();
     this.build();
+  }
+
+  /**
+   * Updates board with win/lose message
+   */
+  this.result = function() {
+    if (board.win) {
+      $('#result').text('You are the winning Sweeper!');
+    } else {
+      $('#result').text('Game Over, sweep elsewhere.');
+    }
   }
 };
 
@@ -153,16 +184,18 @@ function Cell(row, col, isMine) {
   /**
    * Reveals underlying number or mine of a cell, then updates output on board.
    * Finally locks cell to prevent further changes.
+   * @returns {String} if player sweeps a mine.
    */
   this.sweep = function() {
-    var underlying;
+    var mine = '\u26C2';
+    $(cell.htmlTag).attr('id', 'clicked');
     if (cell.isMine) {
-      underlying = '\u26C2';
-    } else {
-      underlying = cell.number;
+      $(cell.htmlTag).text(mine);
+      return mine;
     }
-    cell.displayed = underlying;
-    $(cell.htmlTag).text(underlying);
+    cell.displayed = cell.number || '';
+    $(cell.htmlTag).addClass('colorize' + cell.displayed);
+    $(cell.htmlTag).text(cell.displayed);
     cell.swept = true;
   };
 
@@ -172,9 +205,11 @@ function Cell(row, col, isMine) {
   this.flag = function() {
     if ($(cell.htmlTag).text() == '\u2690') {
       cell.displayed = '';
+      $(cell.htmlTag).removeClass('flag');
       $(cell.htmlTag).text('');
     } else {
       cell.displayed = '\u2690';
+      $(cell.htmlTag).addClass('flag');
       $(cell.htmlTag).text(cell.displayed);
     }
   };
