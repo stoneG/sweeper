@@ -130,6 +130,13 @@ function Board(nRows, nCols, nMines) {
       }
     }
   }
+
+  this.rebuild = function() {
+    board.cells = [];
+    this.init();
+    $('#grid').empty();
+    this.build();
+  }
 };
 
 function Cell(row, col, isMine) {
