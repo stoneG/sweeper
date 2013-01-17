@@ -1,9 +1,9 @@
 
 function Board() {
   var board = this, isMine;
-  board.nRows = 2; // Default
-  board.nCols = 2; // Default
-  board.nMines = 1; // Default
+  board.nRows = 8; // Default
+  board.nCols = 8; // Default
+  board.nMines = 10; // Default
   board.flags = 0;
   board.cells = [];
   board.locked = false;
