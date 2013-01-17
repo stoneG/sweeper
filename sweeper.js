@@ -1,6 +1,6 @@
-var nRows = 8;
-var nCols = 8;
-var nMines = 10;
+var nRows = 2;
+var nCols = 2;
+var nMines = 1;
 
 function Board(nRows, nCols, nMines) {
   var board = this, isMine;
@@ -10,6 +10,7 @@ function Board(nRows, nCols, nMines) {
   board.cells = [];
   board.locked = false;
   board.win = false;
+  board.cheating = false;
 
   /**
    * Initializes board logic.
@@ -22,6 +23,7 @@ function Board(nRows, nCols, nMines) {
     board.cells = [];
     board.locked = false;
     board.win = false;
+    board.cheating = false;
     var i, j;
 
     /**
@@ -149,6 +151,47 @@ function Board(nRows, nCols, nMines) {
   };
 
   /**
+   * Toggles cheat mode, which displays all mines without retribution.
+   * @returns {Undefined} if board is locked.
+   */
+  this.cheat = function() {
+    var i,
+        toggle;
+    if (board.locked) {
+      return;
+    }
+    if (board.cheating) {
+      toggle = 'unreveal';
+      board.cheating = false;
+    } else {
+      toggle = 'reveal';
+      board.cheating = true;
+    }
+    for (i = 0; i < board.mines.length; i++) {
+      if (board.mines[i]) {
+        board.cells[i][toggle]();
+      }
+    }
+  };
+
+  this.submit = function() {
+    var i;
+    if (board.locked) {
+      return;
+    }
+    for (i = 0; i < board.cells.length; i++) {
+      if (!board.mines[i] && !board.cells[i].swept) {
+        board.locked = true;
+        this.result();
+        return;
+      }
+    }
+    board.locked = true;
+    board.win = true;
+    this.result();
+  };
+
+  /**
    * Resets the board with new mine placement and rebuilds the HTML.
    */
   this.rebuild = function() {
@@ -156,7 +199,7 @@ function Board(nRows, nCols, nMines) {
     this.init();
     $('#grid').empty();
     this.build();
-  }
+  };
 
   /**
    * Updates board with win/lose message
@@ -164,14 +207,18 @@ function Board(nRows, nCols, nMines) {
   this.result = function() {
     if (board.win) {
       $('#result').text('You are the winning Sweeper!');
+    } else if (board.cheating) {
+      $('#result').text('Wow, how did you lose while you were cheating?!');
     } else {
       $('#result').text('Game Over, sweep elsewhere.');
     }
-  }
-};
+  };
+}
 
 function Cell(row, col, isMine) {
-  var cell = this;
+  var cell = this,
+      mine = '\u26C2',
+      flag = '\u2690';
   cell.number = 0;
   cell.neighbors = [];
   cell.row = row;
@@ -187,7 +234,6 @@ function Cell(row, col, isMine) {
    * @returns {String} if player sweeps a mine.
    */
   this.sweep = function() {
-    var mine = '\u26C2';
     $(cell.htmlTag).attr('id', 'clicked');
     if (cell.isMine) {
       $(cell.htmlTag).text(mine);
@@ -203,16 +249,27 @@ function Cell(row, col, isMine) {
    * Toggles flag on cell, then updates output on board.
    */
   this.flag = function() {
-    if ($(cell.htmlTag).text() == '\u2690') {
+    if ($(cell.htmlTag).text() == flag) {
       cell.displayed = '';
       $(cell.htmlTag).removeClass('flag');
       $(cell.htmlTag).text('');
     } else {
-      cell.displayed = '\u2690';
+      cell.displayed = flag;
       $(cell.htmlTag).addClass('flag');
       $(cell.htmlTag).text(cell.displayed);
     }
   };
+
+  this.reveal = function() {
+    if (cell.isMine) {
+      $(cell.htmlTag).addClass('reveal');
+    }
+  };
+
+  this.unreveal = function() {
+    $(cell.htmlTag).removeClass('reveal');
+  };
+
 }
 
 $(document).ready(function() {
