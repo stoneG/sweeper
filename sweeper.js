@@ -88,7 +88,7 @@ function Board(nRows, nCols, nMines) {
 
   /**
    * Output the <tr> and <td> elements of the board. Establish click behavior
-   * and disable right clicking on <td> elements.
+   * on <td> elements and disable right click default behavior on the board.
    */
   this.build = function() {
     var i, j, row, col;
@@ -97,16 +97,15 @@ function Board(nRows, nCols, nMines) {
       for (j = 0; j < board.nCols; j++) {
         col = document.createElement('td');
         $(col).mousedown(function(event) {
-          event.preventDefault();
           var cellRow = $(this).parent().prevAll().length;
           var cellCol = $(this).prevAll().length; 
           board.click(event, cellRow * nRows + cellCol);
         });
-        $(col).on("contextmenu", false);
         $(row).append(col)
       }
       $('#grid').append(row)
     }
+    $('#grid').on("contextmenu", false);
   };
 
   /**
