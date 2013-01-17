@@ -3,11 +3,37 @@ body {
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
+    text-align: center;
+}
+
+h1 {
+}
+
+p {
+    color: #909090;
+}
+
+div#menu {
+    margin: auto;
+}
+
+li {
+    display: inline-block;
+    text-transform: uppercase;
+    background-color: #e3e3e3;
+    text-align: center;
+    width: 120px;
+}
+
+li:hover {
+    cursor: pointer;
 }
 
 table {
     border-spacing: 1px;
     background-color: #45455E;
+    margin: auto;
+    margin-top: 2em;
 }
 
 td {
@@ -21,12 +47,26 @@ td {
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
 }
 
+body span {
+    color: red;
+}
+
 #result {
     height: 2em;
+    line-height: 2em;
+    margin: 3px;
+    padding: 3px;
+    font-size: 2em;
+}
+
+.win {
+    color: green;
 }
 
 #flags {
+    margin-top: 3em;
     height: 2em;
+    color: #808080;
 }
 
 td#clicked {

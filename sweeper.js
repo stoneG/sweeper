@@ -1,9 +1,9 @@
 
 function Board() {
   var board = this, isMine;
-  board.nRows = 8; // Default
-  board.nCols = 8; // Default
-  board.nMines = 10; // Default
+  board.nRows = 2; // Default
+  board.nCols = 2; // Default
+  board.nMines = 1; // Default
   board.flags = 0;
   board.cells = [];
   board.locked = false;
@@ -203,12 +203,13 @@ function Board() {
   /**
    * Resizes and rebuilds board if parameters are within reason.
    */
-  this.resize = function(rows, cols) {
-    if ((rows < 1) || (cols < 1)) {
+  this.resize = function(rows, cols, mines) {
+    if ((rows < 1) || (cols < 1) || (mines < 0) || (mines > rows*cols)) {
       throw "resizeError";
     } else {
       board.nRows = rows;
       board.nCols = cols;
+      board.nMines = mines;
       this.rebuild();
     }
   }
@@ -228,10 +229,13 @@ function Board() {
    */
   this.result = function() {
     if (board.win) {
+      $('#result').addClass('win');
       $('#result').text('You are the winning Sweeper!');
     } else if (board.cheating) {
+      $('#result').removeClass('win');
       $('#result').text('Wow, how did you lose while you were cheating?!');
     } else {
+      $('#result').removeClass('win');
       $('#result').text('Game Over, sweep elsewhere.');
     }
   };

@@ -11,9 +11,14 @@
 
   <body>
     <h1>Sweeper</h1>
-    <h2>Sometime in the distant future, there were Sweepers.</h2>
-    <div id="result">&nbsp;</div>
+    <p>Sometime in the distant future, there were Sweepers.</p>
+    <div id="menu">
+      <li onclick="b.rebuild();">New Game</li>
+      <li onclick="b.cheat();">Cheat Mode</li>
+      <li>Resize</li>
+      <li onclick="b.submit();">Submit</li>
     <table id="grid"></table>
+    <span id="result"></span>
     <div>You have flagged <span id="flags">0</span> cells.</div>
     <script type="text/javascript" src="sweeper.js"></script>
   </body>
