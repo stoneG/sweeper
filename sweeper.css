@@ -1,10 +1,67 @@
 body { 
     font-family: 'Droid Sans Mono', Courier, mono;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+table {
+    border-spacing: 1px;
+    background-color: #45455E;
 }
 
 td {
     width: 25px;
     height: 25px;
-    border: 1px solid #404040;
+    border: 1px solid #909090;
     text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    -moz-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+#result {
+    height: 2em;
+}
+
+td#clicked {
+    background-color: #ececec;
+    border: none;
+}
+
+td.flag {
+    color: white;
+}
+
+td.colorize1 {
+    color: blue;
+}
+
+td.colorize2 {
+    color: green;
+}
+
+td.colorize3 {
+    color: red;
+}
+
+td.colorize4 {
+    color: purple;
+}
+
+td.colorize5 {
+    color: yellow;
+}
+
+td.colorize6 {
+    color: white;
+}
+
+td.colorize7 {
+    color: deeppink;
+}
+
+td.colorize8 {
+    color: lightseagreen;
 }
