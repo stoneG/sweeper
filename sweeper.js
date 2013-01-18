@@ -144,7 +144,7 @@ function Board() {
           break;
         case 3:
           board.cells[index].flag();
-          if (board.cells[index].displayed == '\u2690') {
+          if (board.cells[index].displayed == 'f') {
             board.flags++;
           } else {
             board.flags--;
@@ -201,9 +201,13 @@ function Board() {
   };
 
   /**
-   * Resizes and rebuilds board if parameters are within reason.
+   * Toggles resize menu;
    */
-  this.resize = function(rows, cols, mines) {
+  this.resize = function() {
+    $('#resize').slideToggle(300);
+    return false;
+  };
+/*
     if ((rows < 1) || (cols < 1) || (mines < 0) || (mines > rows*cols)) {
       throw "resizeError";
     } else {
@@ -212,13 +216,22 @@ function Board() {
       board.nMines = mines;
       this.rebuild();
     }
-  }
+  }*/
 
   /**
    * Resets the board with new mine placement and rebuilds the HTML.
    */
   this.rebuild = function() {
+    var d = document,
+        size = +d.getElementById('size').value,
+        mines = +d.getElementById('mines').value;
+    size = Math.min(32, Math.max(size, 0)) || 8;
+    mines = Math.min(size*size, Math.max(mines, 0)) || 10;
+    board.nRows = board.nCols = d.getElementById('size').value = size;
+    board.nMines = d.getElementById('mines').value = mines;
+    if (d.getElementById('resize').style.display == "block") {this.resize()};
     $('#result').text('');
+    $('#flags').text(0);
     this.init();
     $('#grid').empty();
     this.build();
@@ -228,23 +241,36 @@ function Board() {
    * Updates board with win/lose message
    */
   this.result = function() {
+    var random = Math.floor(Math.random()*6),
+        win = ['Sweep on, Rock Star!',
+               'Wow, that was broomtastic..!',
+               'Sweet style, savage sweeping soul sister.',
+               "Nimbus 2000's got nothing on your Firebolt!",
+               "You probably have tons of high scores on Dustforce.",
+               'Your moves always sweep me off my feet.'],
+        lose = ['Sweep elsewhere, amigo.',
+                'Leave the broom here on your way out.',
+                'Wow... Just wow.',
+                'Mary Poppins shakes her head in disappointment.',
+                "You'll never be a real Seeker..err..Sweeper.",
+                'Who let you out of the broom closet??'];
     if (board.win) {
       $('#result').addClass('win');
-      $('#result').text('You are the winning Sweeper!');
+      $('#result').text(win[random]);
     } else if (board.cheating) {
       $('#result').removeClass('win');
       $('#result').text('Wow, how did you lose while you were cheating?!');
     } else {
       $('#result').removeClass('win');
-      $('#result').text('Game Over, sweep elsewhere.');
+      $('#result').text(lose[random]);
     }
   };
 }
 
 function Cell(row, col, isMine) {
   var cell = this,
-      mine = '\u26C2',
-      flag = '\u2690';
+      mine = 'x',
+      flag = 'f';
   cell.number = 0;
   cell.neighbors = [];
   cell.row = row;
@@ -253,6 +279,7 @@ function Cell(row, col, isMine) {
   cell.displayed = '';
   cell.htmlTag = 'tr:eq(' + cell.row + ') td:eq(' + cell.col + ')';
   cell.swept = false;
+  cell.flagged = false;
 
   /**
    * Reveals underlying number or mine of a cell, then updates output on board.
@@ -262,6 +289,7 @@ function Cell(row, col, isMine) {
   this.sweep = function() {
     $(cell.htmlTag).attr('id', 'clicked');
     if (cell.isMine) {
+      $(cell.htmlTag).addClass('mine');
       $(cell.htmlTag).text(mine);
       return mine;
     }

@@ -7,11 +7,18 @@ body {
 }
 
 h1 {
-    font-size: 3em;
+    font-family: 'Permanent Marker', 'Source Sans Pro', 'Droid Sans Mono', Courier, mono;
+    letter-spacing: 4px;
+    font-size: 4em;
+    color: #C53131;
+    margin: 0;
 }
 
 p {
+    font-family: 'IM Fell DW Pica SC', 'Source Sans Pro', 'Droid Sans Mono', Courier, mono;
+    font-size: 1.3em;
     color: #909090;
+    margin-top: 0;
 }
 
 div#menu {
@@ -23,23 +30,59 @@ li {
     text-transform: uppercase;
     background-color: #e3e3e3;
     text-align: center;
+    padding: 4px;
     width: 120px;
 }
 
 li:hover {
     cursor: pointer;
+    background-color: #C53131;
+    color: white;
+}
+
+div#resize {
+    margin-top: 2em;
+    margin-bottom: 0;
+    font-family: 'IM Fell DW Pica SC', 'Source Sans Pro';
+    font-size: 1em;
+    color: #808080;
+}
+
+input {
+    border: 2px solid white; 
+    -webkit-box-shadow: 
+      inset 0 0 2px  rgba(0,0,0,0.1),
+            0 0 4px rgba(0,0,0,0.1); 
+    -moz-box-shadow: 
+      inset 0 0 2px  rgba(0,0,0,0.1),
+            0 0 4px rgba(0,0,0,0.1); 
+    box-shadow: 
+      inset 0 0 2px  rgba(0,0,0,0.1),
+            0 0 4px rgba(0,0,0,0.1); 
+    padding: 3px;
+    background: rgba(255,255,255,0.5);
+    margin: 0 10px;
+    text-align: center;
+    color: #C53131;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
 }
 
 table {
+    font-family: 'Permanent Marker', 'Droid Sans Mono', Courier, mono;
     border-spacing: 1px;
-    background-color: #45455E;
+    background-color: #425275;
     margin: auto;
     margin-top: 2em;
 }
 
 td {
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
     border: 1px solid #909090;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -49,10 +92,11 @@ td {
 }
 
 body span {
-    color: red;
+    color: #C53131;
 }
 
 #result {
+    font-family: 'Permanent Marker', cursive;
     height: 2em;
     line-height: 2em;
     margin: 3px;
@@ -65,9 +109,11 @@ body span {
 }
 
 #flags {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 2em;
     margin-top: 3em;
     height: 2em;
-    color: #808080;
+    color: #C53131;
 }
 
 td#clicked {
@@ -76,11 +122,22 @@ td#clicked {
 }
 
 td.reveal {
-    background-color: red;
+    background-color: #C53131;
 }
 
 td.flag {
-    color: white;
+    padding: 0;
+    margin: 0;
+    font-size: 1em;
+    color: #ececec;
+    background-color: #050041;
+}
+
+td.mine {
+    padding: 0;
+    margin: 0;
+    font-size: 1.1em;
+    color: #C53131;
 }
 
 td.colorize1 {
@@ -92,7 +149,7 @@ td.colorize2 {
 }
 
 td.colorize3 {
-    color: red;
+    color: orange;
 }
 
 td.colorize4 {
@@ -100,17 +157,17 @@ td.colorize4 {
 }
 
 td.colorize5 {
-    color: yellow;
+    color: #FF00EB;
 }
 
 td.colorize6 {
-    color: white;
+    color: #858585;
 }
 
 td.colorize7 {
-    color: deeppink;
+    color: #07BDBD;
 }
 
 td.colorize8 {
-    color: lightseagreen;
+    color: black;
 }
